@@ -1,5 +1,5 @@
 // Cross-platform host: GLFW + OpenGL 3 (Linux / macOS / Windows).
-// INSERT toggles the menu.
+// INSERT (menu::toggle_key) toggles the menu.
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -29,7 +29,7 @@ int main(int, char**)
 #endif
 
     // Window matches the reference screenshot (769x469).
-    GLFWwindow* window = glfwCreateWindow(769, 469, "Magnet", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(769, 469, "Impulze", nullptr, nullptr);
     if (!window)
         return 1;
     glfwMakeContextCurrent(window);
@@ -56,7 +56,7 @@ int main(int, char**)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        if (ImGui::IsKeyPressed(ImGuiKey_Insert, false))
+        if (ImGui::IsKeyPressed((ImGuiKey)menu::toggle_key, false))
             menu::open = !menu::open;
         menu::Render();
 

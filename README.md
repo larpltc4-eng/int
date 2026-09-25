@@ -1,12 +1,31 @@
-# ImGui menu (1:1)
+# Impulze - ImGui menu
 
-A Dear ImGui menu that recreates the reference screenshot 1:1 (checked with a pixel diff against it): the icon sidebar, the purple gradient tabs, the page content and the footer with the build date.
+A Dear ImGui menu whose layout recreates the reference screenshot 1:1 (checked with a pixel diff against it): the icon sidebar, the purple gradient tabs and the footer with the build date. The pages hold a set of custom widgets in the same style.
 
 | Reference | This project |
 |---|---|
 | ![reference](docs/reference.png) | ![render](docs/render.png) |
 
-(The only difference in the footer is the date, because it comes from `__TIME__` / `__DATE__` of your own build.)
+## Widgets
+
+All in `menu::widgets` (`src/menu/widgets.hpp`). They fill the width of the current panel and return `true` when the value changes:
+
+```cpp
+widgets::BeginPanel("General", ImVec2(width, 0));      // rounded panel with a title; 0 = remaining space
+widgets::Checkbox("Enabled", &enabled);
+widgets::Toggle("Performance mode", &performance);      // switch
+widgets::SliderFloat("Speed", &speed, 0.0f, 100.0f, "%.1f");
+widgets::SliderInt("Amount", &amount, 0, 10);
+widgets::Combo("Mode", &mode, items, IM_ARRAYSIZE(items));
+widgets::MultiCombo("Filters", flags, items, IM_ARRAYSIZE(items)); // bool flags[]
+widgets::ColorEdit("Accent color", color);              // float color[4], opens a color picker
+widgets::Keybind("Menu key", &key);                     // int ImGuiKey, Escape clears it
+if (widgets::Button("Reset")) { /* ... */ }
+widgets::EndPanel();
+ImGui::SameLine(0.0f, 8.0f);                            // next panel on the right
+```
+
+See `DrawShowcase()` in `src/menu/menu.cpp` for the example page. Colors and sizes of the widgets are in `src/menu/style.hpp`.
 
 ## Adding it to your project
 
@@ -24,7 +43,7 @@ ImGui_ImplDX11_Init(device, context);
 ImGui_ImplDX11_NewFrame();
 ImGui_ImplWin32_NewFrame();
 ImGui::NewFrame();
-if (ImGui::IsKeyPressed(ImGuiKey_Insert, false))
+if (ImGui::IsKeyPressed((ImGuiKey)menu::toggle_key, false)) // Insert by default, can be changed in the menu
     menu::open = !menu::open;
 menu::Render();
 ImGui::Render();
@@ -36,8 +55,8 @@ If your project already calls `ImGui::StyleColorsDark()` or adds its own fonts, 
 
 | File | Contents |
 |---|---|
-| `src/menu/menu.cpp` | Window layout, sidebar pages, tabs, footer, and the page contents (edit `DrawAim`, `DrawPlaceholder`, ...) |
-| `src/menu/widgets.cpp` | `SidebarButton`, `Tab`, `Checkbox` (with hover/selection animations) |
+| `src/menu/menu.cpp` | Window layout, sidebar pages, tabs, footer (brand text `kBrand`), and the page contents (`DrawShowcase`, `DrawPlaceholder`, ...) |
+| `src/menu/widgets.cpp` | Sidebar button, tab, panel and all the widgets above (with hover/selection animations) |
 | `src/menu/style.hpp` | All sizes and colors, measured from the screenshot |
 | `src/menu/style.cpp` | `ImGuiStyle` colors, so stock widgets (sliders, combos...) match |
 | `src/menu/fonts.cpp` | Embedded fonts: Montserrat Medium/SemiBold and Font Awesome 5 Solid |

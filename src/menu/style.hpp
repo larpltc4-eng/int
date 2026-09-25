@@ -28,6 +28,20 @@ namespace menu::style
     inline constexpr float kFooterPaddingX        = 3.0f;
     inline constexpr float kFooterPaddingRightX   = 5.0f;
 
+    // Widgets (page content)
+    inline constexpr float kPanelHeaderHeight     = 34.0f;
+    inline constexpr ImVec2 kPanelPadding         = { 12.0f, 10.0f };
+    inline constexpr float kPanelSpacing          = 8.0f;   // gap between panels
+    inline constexpr float kWidgetSpacing         = 8.0f;   // vertical gap between widgets
+    inline constexpr float kWidgetRounding        = 4.0f;
+    inline constexpr float kCheckboxSize          = 18.0f;
+    inline constexpr ImVec2 kToggleSize           = { 32.0f, 16.0f };
+    inline constexpr float kSliderTrackHeight     = 6.0f;
+    inline constexpr float kSliderKnobRadius      = 6.0f;
+    inline constexpr float kComboHeight           = 26.0f;
+    inline constexpr float kButtonHeight          = 28.0f;
+    inline constexpr ImVec2 kColorSwatchSize      = { 30.0f, 14.0f };
+
     inline constexpr float kFontSize              = 17.0f;
     inline constexpr float kFooterFontSize        = 14.0f;
     inline constexpr float kIconFontSize          = 20.0f;
@@ -48,6 +62,14 @@ namespace menu::style
     inline constexpr ImU32 kTabText         = IM_COL32(199, 199, 199, 255);
     inline constexpr ImU32 kTabTextActive   = IM_COL32(255, 255, 255, 255);
     inline constexpr ImU32 kText            = IM_COL32(255, 255, 255, 255);
+
+    inline constexpr ImU32 kPanelBg         = IM_COL32( 26,  25,  32, 255);
+    inline constexpr ImU32 kFrameBg         = IM_COL32( 35,  35,  44, 255);
+    inline constexpr ImU32 kFrameBgHovered  = IM_COL32( 45,  45,  57, 255);
+    inline constexpr ImU32 kAccentHovered   = IM_COL32(110,  50, 255, 255);
+    inline constexpr ImU32 kLabel           = kTabText;
+    inline constexpr ImU32 kKnob            = IM_COL32(235, 235, 240, 255);
+    inline constexpr ImU32 kKnobOff         = IM_COL32(150, 152, 158, 255);
 
     // Applies the palette above to ImGuiStyle so stock widgets match the menu.
     void Apply();

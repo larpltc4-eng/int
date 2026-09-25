@@ -31,12 +31,12 @@ namespace menu::style
         c[ImGuiCol_TextDisabled]         = ImGui::ColorConvertU32ToFloat4(kIcon);
         c[ImGuiCol_WindowBg]             = content;
         c[ImGuiCol_ChildBg]              = none;
-        c[ImGuiCol_PopupBg]              = content;
+        c[ImGuiCol_PopupBg]              = ImGui::ColorConvertU32ToFloat4(kPanelBg);
         c[ImGuiCol_Border]               = active_bg;
         c[ImGuiCol_BorderShadow]         = none;
-        c[ImGuiCol_FrameBg]              = sidebar;
-        c[ImGuiCol_FrameBgHovered]       = active_bg;
-        c[ImGuiCol_FrameBgActive]        = active_bg;
+        c[ImGuiCol_FrameBg]              = active_bg;
+        c[ImGuiCol_FrameBgHovered]       = ImGui::ColorConvertU32ToFloat4(kFrameBgHovered);
+        c[ImGuiCol_FrameBgActive]        = ImGui::ColorConvertU32ToFloat4(kFrameBgHovered);
         c[ImGuiCol_TitleBg]              = dark;
         c[ImGuiCol_TitleBgActive]        = dark;
         c[ImGuiCol_TitleBgCollapsed]     = dark;

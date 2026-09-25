@@ -12,29 +12,77 @@ namespace menu
 {
     namespace
     {
-        constexpr const char* kBrand     = "Magnet Free";
+        constexpr const char* kBrand     = "Impulze";
         constexpr const char* kBuildDate = "Build Date: " __TIME__ " | " __DATE__;
 
         // Page contents ------------------------------------------------------
+        // Example values for the widget showcase. Replace with your own settings.
         struct State
         {
-            bool test = false;
-            bool options[6][4][3] = {};
-            float sliders[6][4] = {};
-            int combos[6][4] = {};
-        } state;
+            bool enabled = true;
+            bool watermark = false;
+            bool keybinds = true;
+            bool performance = false;
+            float speed = 42.5f;
+            int amount = 3;
+            int mode = 0;
+            bool filters[4] = { true, false, true, false };
+            float accent[4] = { 80 / 255.0f, 0.0f, 1.0f, 1.0f };
+            float background[4] = { 21 / 255.0f, 20 / 255.0f, 27 / 255.0f, 0.85f };
+
+            // Placeholder pages: [page][tab]
+            bool options[6][4][4] = {};
+            float values[6][4] = {};
+            int modes[6][4] = {};
+            float colors[6][4][4] = {};
+        };
+        State state;
+
+        constexpr const char* kModes[]   = { "Default", "Smooth", "Instant" };
+        constexpr const char* kFilters[] = { "Text", "Icons", "Shadows", "Outline" };
+
+        // Two panels side by side filling the page.
+        template <typename Left, typename Right>
+        void TwoPanels(const char* left_title, Left&& left, const char* right_title, Right&& right)
+        {
+            const float half = IM_TRUNC((ImGui::GetContentRegionAvail().x - style::kPanelSpacing) * 0.5f);
+            widgets::BeginPanel(left_title, ImVec2(half, 0.0f));
+            left();
+            widgets::EndPanel();
+            ImGui::SameLine(0.0f, style::kPanelSpacing);
+            widgets::BeginPanel(right_title);
+            right();
+            widgets::EndPanel();
+        }
+
+        void DrawShowcase()
+        {
+            TwoPanels("General", [] {
+                widgets::Checkbox("Enabled", &state.enabled);
+                widgets::Checkbox("Show watermark", &state.watermark);
+                widgets::Checkbox("Show keybinds", &state.keybinds);
+                widgets::Toggle("Performance mode", &state.performance);
+                widgets::Keybind("Menu key", &toggle_key);
+                if (widgets::Button("Reset"))
+                    state = State();
+            }, "Settings", [] {
+                widgets::SliderFloat("Speed", &state.speed, 0.0f, 100.0f, "%.1f");
+                widgets::SliderInt("Amount", &state.amount, 0, 10);
+                widgets::Combo("Mode", &state.mode, kModes, IM_ARRAYSIZE(kModes));
+                widgets::MultiCombo("Filters", state.filters, kFilters, IM_ARRAYSIZE(kFilters));
+                widgets::ColorEdit("Accent color", state.accent);
+                widgets::ColorEdit("Background", state.background);
+            });
+        }
 
         void DrawPlaceholder(int page, int tab);
 
         void DrawAim(int tab)
         {
             if (tab == 0)
-            {
-                ImGui::Text("fhfghfg");
-                widgets::Checkbox("Test", &state.test);
-                return;
-            }
-            DrawPlaceholder(1, tab);
+                DrawShowcase();
+            else
+                DrawPlaceholder(1, tab);
         }
 
         // Pages ----------------------------------------------------------------
@@ -69,14 +117,17 @@ namespace menu
 
         void DrawPlaceholder(int page, int tab)
         {
-            static const char* const kComboItems[] = { "First", "Second", "Third" };
-            ImGui::Text("%s / %s", kPages[page].name, kPages[page].tabs[tab]);
-            widgets::Checkbox("Enabled", &state.options[page][tab][0]);
-            widgets::Checkbox("Option", &state.options[page][tab][1]);
-            ImGui::SetNextItemWidth(200.0f);
-            ImGui::SliderFloat("Value", &state.sliders[page][tab], 0.0f, 100.0f, "%.0f");
-            ImGui::SetNextItemWidth(200.0f);
-            ImGui::Combo("Mode", &state.combos[page][tab], kComboItems, IM_ARRAYSIZE(kComboItems));
+            bool* options = state.options[page][tab];
+            TwoPanels(kPages[page].tabs[tab], [&] {
+                widgets::Checkbox("Option 1", &options[0]);
+                widgets::Checkbox("Option 2", &options[1]);
+                widgets::Checkbox("Option 3", &options[2]);
+                widgets::Toggle("Option 4", &options[3]);
+            }, "Options", [&] {
+                widgets::SliderFloat("Value", &state.values[page][tab], 0.0f, 100.0f, "%.0f");
+                widgets::Combo("Mode", &state.modes[page][tab], kModes, IM_ARRAYSIZE(kModes));
+                widgets::ColorEdit("Color", state.colors[page][tab]);
+            });
         }
 
         // Layout ---------------------------------------------------------------

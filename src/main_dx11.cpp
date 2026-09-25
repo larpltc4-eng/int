@@ -1,5 +1,5 @@
 // Windows host: Win32 + DirectX 11 (based on Dear ImGui's example_win32_directx11).
-// INSERT toggles the menu.
+// INSERT (menu::toggle_key) toggles the menu.
 
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
@@ -29,7 +29,7 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int)
     // Client area matches the reference screenshot (769x469).
     RECT rect = { 0, 0, 769, 469 };
     ::AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Magnet", WS_OVERLAPPEDWINDOW, 100, 100, rect.right - rect.left, rect.bottom - rect.top, nullptr, nullptr, instance, nullptr);
+    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Impulze", WS_OVERLAPPEDWINDOW, 100, 100, rect.right - rect.left, rect.bottom - rect.top, nullptr, nullptr, instance, nullptr);
 
     if (!CreateDeviceD3D(hwnd))
     {
@@ -82,7 +82,7 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR, int)
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
-        if (ImGui::IsKeyPressed(ImGuiKey_Insert, false))
+        if (ImGui::IsKeyPressed((ImGuiKey)menu::toggle_key, false))
             menu::open = !menu::open;
         menu::Render();
 

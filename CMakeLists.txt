@@ -38,6 +38,20 @@ else()
     target_compile_options(menu PRIVATE -Wall -Wextra)
 endif()
 
+# CipherX (renderer agnostic) -------------------------------------------------------
+find_package(Threads REQUIRED)
+add_library(cipherx STATIC
+    src/cipherx/cipherx.cpp
+    src/cipherx/fonts.cpp
+)
+target_include_directories(cipherx PUBLIC src)
+target_link_libraries(cipherx PUBLIC imgui Threads::Threads)
+if(MSVC)
+    target_compile_options(cipherx PRIVATE /W4 /utf-8)
+else()
+    target_compile_options(cipherx PRIVATE -Wall -Wextra)
+endif()
+
 # Windows: Win32 + DirectX 11 ------------------------------------------------------
 if(WIN32)
     add_executable(menu_dx11 WIN32
@@ -49,6 +63,13 @@ if(WIN32)
     if(MSVC)
         set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT menu_dx11)
     endif()
+
+    add_executable(cipherx_dx11 WIN32
+        src/cipherx_dx11.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_win32.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_dx11.cpp
+    )
+    target_link_libraries(cipherx_dx11 PRIVATE cipherx d3d11 d3dcompiler dxgi)
 endif()
 
 # GLFW + OpenGL 3 -------------------------------------------------------------------
@@ -61,4 +82,11 @@ if(MENU_BUILD_GLFW)
         ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
     )
     target_link_libraries(menu_glfw PRIVATE menu glfw OpenGL::GL ${CMAKE_DL_LIBS})
+
+    add_executable(cipherx_glfw
+        src/cipherx_glfw.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+    )
+    target_link_libraries(cipherx_glfw PRIVATE cipherx glfw OpenGL::GL ${CMAKE_DL_LIBS})
 endif()

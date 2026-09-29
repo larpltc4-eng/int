@@ -27,7 +27,36 @@ ImGui::SameLine(0.0f, 8.0f);                            // next panel on the rig
 
 See `DrawShowcase()` in `src/menu/menu.cpp` for the example page. Colors and sizes of the widgets are in `src/menu/style.hpp`.
 
-## Adding it to your project
+## Tile menu (`src/tilemenu/`)
+
+A second, separate menu that recreates a different reference screenshot 1:1: an empty black title bar, two rows of four black tiles (the selected one is white), and the *Skin* page under them (button, four check boxes, a flat slider with its value and name). The window background is translucent, so whatever is drawn behind it shows through. Sizes, positions and colors were measured from the screenshot and checked against it by aligning the text and boxes (all within 1-2 px; the screenshot itself is a blurry video frame). Font: Roboto Bold, 32 px em.
+
+| Reference | This project (over the demo backdrop) |
+|---|---|
+| ![reference](docs/tilemenu_reference.png) | ![render](docs/tilemenu_render.png) |
+
+It is only the interface: it stores the values of its widgets in `tilemenu::state` and does nothing else. The reference only shows the *Skin* tab, so the other seven tabs are empty pages; give a tab your own page with `tilemenu::pages[tilemenu::Tab_Misc] = &MyPage;` (the function runs inside the menu window, right under the tabs).
+
+```cpp
+#include "tilemenu/tilemenu.hpp"
+
+ImGui::CreateContext();
+tilemenu::Initialize();   // adds Roboto Bold to the font atlas, BEFORE the first NewFrame; leaves your ImGui style alone
+
+// every frame:
+ImGui::NewFrame();
+if (ImGui::IsKeyPressed((ImGuiKey)tilemenu::toggle_key, false)) // Insert by default
+    tilemenu::open = !tilemenu::open;
+tilemenu::Render();       // pushes its own style + font and pops them again
+if (tilemenu::state.unlock_all_skins_clicked) { /* true for one frame */ }
+ImGui::Render();
+```
+
+`tilemenu::state` holds the tab, the four check boxes and `buddy_index` (0..`kBuddyMax`). `tilemenu::buddy_name` can be set to a `const char* (*)(int)` to name the slider values (by default 625 is "V25A3: Radiant Buddy" as in the screenshot). `tilemenu::DrawDemoBackdrop()` only paints a gradient behind the window for the examples.
+
+Copy `src/tilemenu/` into your project and compile `tilemenu.cpp` (Dear ImGui 1.91.9b on the include path). Everything measured lives in the `layout` and `colors` namespaces at the top of `tilemenu.cpp`. Examples: `tilemenu_glfw` (Linux / macOS / Windows) and `tilemenu_dx11` (Windows), built the same way as `menu_glfw` / `menu_dx11` below. The Roboto license (Apache 2.0) is in `src/tilemenu/fonts/LICENSE-Roboto.txt`.
+
+## Adding the Impulze menu to your project
 
 Copy `src/menu/` into your project and compile its four `.cpp` files. Dear ImGui (1.91.9b, vendored in `external/imgui`) must be on the include path. Then:
 

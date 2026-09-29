@@ -38,6 +38,16 @@ else()
     target_compile_options(menu PRIVATE -Wall -Wextra)
 endif()
 
+# The translucent tile menu (renderer agnostic) -----------------------------------
+add_library(tilemenu STATIC src/tilemenu/tilemenu.cpp)
+target_include_directories(tilemenu PUBLIC src)
+target_link_libraries(tilemenu PUBLIC imgui)
+if(MSVC)
+    target_compile_options(tilemenu PRIVATE /W4 /utf-8)
+else()
+    target_compile_options(tilemenu PRIVATE -Wall -Wextra)
+endif()
+
 # Windows: Win32 + DirectX 11 ------------------------------------------------------
 if(WIN32)
     add_executable(menu_dx11 WIN32
@@ -46,6 +56,12 @@ if(WIN32)
         ${IMGUI_DIR}/backends/imgui_impl_dx11.cpp
     )
     target_link_libraries(menu_dx11 PRIVATE menu d3d11 d3dcompiler dxgi)
+    add_executable(tilemenu_dx11 WIN32
+        src/main_tilemenu_dx11.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_win32.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_dx11.cpp
+    )
+    target_link_libraries(tilemenu_dx11 PRIVATE tilemenu d3d11 d3dcompiler dxgi)
     if(MSVC)
         set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT menu_dx11)
     endif()
@@ -61,4 +77,10 @@ if(MENU_BUILD_GLFW)
         ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
     )
     target_link_libraries(menu_glfw PRIVATE menu glfw OpenGL::GL ${CMAKE_DL_LIBS})
+    add_executable(tilemenu_glfw
+        src/main_tilemenu_glfw.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+        ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+    )
+    target_link_libraries(tilemenu_glfw PRIVATE tilemenu glfw OpenGL::GL ${CMAKE_DL_LIBS})
 endif()

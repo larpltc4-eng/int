@@ -8,12 +8,13 @@
 // 16-235 "video range" (the white Windows title bar is 235 there), both were undone here.
 namespace uzi::style
 {
-    // Fonts: Poppins, sizes are em sizes (CSS / GDI "font-size" in px). ImGui sizes a font by
-    // ascender - descender instead, see fonts.cpp.
-    inline constexpr float kTextSize    = 14.5f; // Regular: labels, buttons, values
+    // Fonts: Poppins, sizes are em sizes (CSS / GDI "font-size" in px) as measured. ImGui sizes a font by
+    // ascender - descender instead and they are rounded to whole pixels there, see fonts.cpp
+    // (ImGui sizes: 20, 23, 32 and 19 px at 100%).
+    inline constexpr float kTextSize    = 14.5f;  // Regular: labels, buttons, values
     inline constexpr float kSidebarSize = 16.75f; // Regular: sidebar buttons
-    inline constexpr float kTitleSize   = 22.9f; // Medium: "UziClicker"
-    inline constexpr float kToggleSize  = 13.4f; // Bold: ON / OFF
+    inline constexpr float kTitleSize   = 22.9f;  // Medium: "UziClicker"
+    inline constexpr float kToggleSize  = 13.4f;  // Bold: ON / OFF
 
     // Sidebar -------------------------------------------------------------------------------
     inline constexpr ImVec2 kTitlePos          = { 17.0f, 35.0f };  // x, baseline

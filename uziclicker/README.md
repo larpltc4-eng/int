@@ -2,6 +2,8 @@
 
 GUI ze screena odtworzone w Dear ImGui (C++17): natywne okno Windows (Win32 + DirectX 11) z paskiem zakładek po lewej i stroną **Makro**. Układ, rozmiary, font i kolory są zmierzone ze screena i sprawdzone porównaniem piksel po pikselu.
 
+Działa z Dear ImGui **1.91** i **1.92+** (sprawdzone na 1.91.9b i 1.92.9, obie wersje dają ten sam obraz).
+
 | Screen | Render |
 | --- | --- |
 | ![screen](docs/reference.png) | ![render](docs/render.png) |
@@ -51,17 +53,21 @@ Dear ImGui 1.91.9b jest brany z `external/imgui` (wspólny z resztą repo). Inn�
 
 ## Użycie w swoim projekcie
 
-Dodaj `src/uzi/*.cpp` i katalog `src` do include'ów. Źródła są w UTF-8 (polskie napisy), w MSVC potrzebna jest flaga `/utf-8` (CMake ustawia ją sam).
+1. Skopiuj katalog `src/uzi` do swojego projektu (to całe GUI: 3 pliki `.cpp`, nagłówki i fonty).
+2. Dodaj do kompilacji `uzi/fonts.cpp`, `uzi/menu.cpp`, `uzi/widgets.cpp`, a katalog, w którym leży `uzi/`, do ścieżek include (żeby działało `#include "uzi/menu.hpp"`). Projekt musi mieć Dear ImGui 1.91 albo nowszy (`imgui.h` i `imgui_internal.h` w include'ach).
+3. Źródła są w UTF-8 (polskie napisy). W Visual Studio dodaj `/utf-8` w *C/C++ → Command Line → Additional Options* (CMake z tego katalogu robi to sam).
 
 ```cpp
 #include "uzi/menu.hpp"
 
 ImGui::CreateContext();
-uzi::Setup(dpi_scale);   // fonty + styl, przed pierwszym NewFrame (1.0f = 100%)
+uzi::Setup(dpi_scale);   // fonty, przed pierwszym NewFrame (1.0f = 100%)
 
 // co klatkę:
 ImGui::NewFrame();
-uzi::Render();           // wypełnia całe io.DisplaySize
+uzi::Render();           // wypełnia całe io.DisplaySize (GUI jest zawartością okna, jak w main_dx11.cpp)
+// albo:
+uzi::Render(false);      // przesuwane okno ImGui 624x415 w twojej aplikacji / overlayu
 ImGui::Render();
 
 // odczyt ustawień:
@@ -72,7 +78,7 @@ s.left.min_cps;          // s.left.max_cps, s.right... (PPM)
 s.block_ms;              // s.auto_block, s.w_tap, s.sticky_toggle
 ```
 
-Menu zajmuje całe okno, więc ma być jedyną rzeczą w swoim oknie, tak jak w `src/main_dx11.cpp`.
+GUI nie zmienia globalnego stylu ImGui (wszystko, czego potrzebuje, ustawia na czas `Render()`), więc pozostałe okna twojego projektu wyglądają jak wcześniej. Jeśli projekt sam dodaje fonty, wołaj `uzi::Setup()` przed nimi albo zamiast nich: `Setup()` czyści `io.Fonts` i ładuje Poppins, a pierwszy dodany font staje się domyślnym fontem ImGui.
 
 ## Pliki
 
@@ -88,7 +94,7 @@ Menu zajmuje całe okno, więc ma być jedyną rzeczą w swoim oknie, tak jak w 
 ## Pomiary
 
 - Screen to klatka z nagrania. Jest przeskalowana do 2/3 (przyciski paska tytułu Windows mają na nim 31 px szerokości zamiast 46) i ma kolory ściśnięte do zakresu wideo 16–235 (biały pasek tytułu ma 235, czarny tekst 16). Oba efekty są odwrócone, więc np. tło okna jest czarne, a nie `#101010` jak na screenie.
-- Font: Poppins, rozpoznany i dopasowany do napisów ze screena. Regular 14,5 px (napisy), 16,75 px (zakładki), Medium 22,9 px (tytuł), Bold 13,4 px (ON / OFF).
+- Font: Poppins, rozpoznany i dopasowany do napisów ze screena. Regular 14,5 px (napisy), 16,75 px (zakładki), Medium 22,9 px (tytuł), Bold 13,4 px (ON / OFF). W ImGui to rozmiary 20, 23, 32 i 19 px (ImGui mierzy font od górnej do dolnej linii i używa całych pikseli).
 - Zakładki 124×35 co 45,7 px, obramowanie 2 px. Bind 155×26, lista 124×26 z zaokrągleniem 10 px. Suwak: tor 246×6, gałka ⌀12,8. Pola z wartością 52×21 (obramowanie 1,5 px), pole MS 62×32.
 - Kolory: niebieski `(0, 187, 255)` na obramowaniach, suwakach i wyróżnionych słowach, `(0, 169, 233)` na zaznaczonej zakładce, tor suwaka `(60, 62, 62)`, OFF `(255, 75, 70)`. Stan ON, najechanie myszą i rozwinięta lista nie są widoczne na screenie, więc są dorobione w tym samym stylu.
 - Napisy są przepisane 1:1 razem z literówkami oryginału („Gardaowanie MS”, „Przełącznie stałe”). Wszystkie są w `src/uzi/menu.cpp`.

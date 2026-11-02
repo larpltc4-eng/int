@@ -2,8 +2,9 @@
 
 #include "imgui.h"
 
-// UziClicker menu (Dear ImGui). It fills the whole display area, so it is meant to be the only thing
-// drawn in its own window: see main_dx11.cpp (Win32 + DirectX 11) and main_glfw.cpp (GLFW + OpenGL 3).
+// UziClicker menu (Dear ImGui 1.91 or 1.92+). By default it fills the whole display area, so it is
+// the only thing drawn in its own native window: see main_dx11.cpp (Win32 + DirectX 11) and
+// main_glfw.cpp (GLFW + OpenGL 3). Render(false) draws it as a movable window inside an existing app.
 //
 //     ImGui::CreateContext();
 //     uzi::Setup(dpi_scale);   // fonts + style, before the renderer backend creates the font texture
@@ -48,10 +49,15 @@ namespace uzi
     inline constexpr int kRightCpsMin = 5, kRightCpsMax = 50;
     inline constexpr int kBlockMsMin  = 0, kBlockMsMax  = 9999;
 
-    // Loads the fonts and sets the style for the given DPI scale (1.0 = 100%). Can be called again
-    // (e.g. on WM_DPICHANGED), the renderer backend then has to rebuild its font texture.
+    // Loads the fonts for the given DPI scale (1.0 = 100%). It clears io.Fonts first, so call it before
+    // adding other fonts; the menu's text font becomes ImGui's default font. Can be called again (e.g. on
+    // WM_DPICHANGED), the renderer backend then has to rebuild its font texture. The global ImGuiStyle is
+    // not touched: Render() pushes everything it needs.
     void Setup(float dpi_scale = 1.0f);
-    void Render();
+
+    // fill_display = true:  covers the whole io.DisplaySize (the menu is the native window's content).
+    // fill_display = false: a movable 624x415 (x DPI scale) ImGui window, drag it by its background.
+    void Render(bool fill_display = true);
 
     Settings& GetSettings();
     Page&     CurrentPage();

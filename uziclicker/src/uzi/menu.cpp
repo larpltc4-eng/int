@@ -93,30 +93,45 @@ namespace uzi
     {
         widgets::SetScale(dpi_scale);
         fonts::Load(dpi_scale);
-
-        ImGuiStyle& st = ImGui::GetStyle();
-        st = ImGuiStyle();
-        st.WindowPadding    = ImVec2(0.0f, 0.0f);
-        st.WindowBorderSize = 0.0f;
-        st.WindowRounding   = 0.0f;
-        st.PopupBorderSize  = 0.0f;
-        st.FrameBorderSize  = 0.0f;
-
-        ImVec4* c = st.Colors;
-        c[ImGuiCol_WindowBg]       = ImGui::ColorConvertU32ToFloat4(style::kBackground);
-        c[ImGuiCol_Text]           = ImGui::ColorConvertU32ToFloat4(style::kText);
-        c[ImGuiCol_PopupBg]        = ImGui::ColorConvertU32ToFloat4(style::kDropdown);
-        c[ImGuiCol_TextSelectedBg] = ImVec4(0.0f, 187 / 255.0f, 1.0f, 0.40f);
-        c[ImGuiCol_NavCursor]      = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
-    void Render()
+    void Render(bool fill_display)
     {
-        ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
-        ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
-        const ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings |
-                                       ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoNavFocus;
+        ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoNavFocus;
+        if (fill_display)
+        {
+            ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
+            ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+            flags |= ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus;
+        }
+        else
+        {
+            ImGui::SetNextWindowPos(ImVec2(100.0f, 100.0f), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize(ImVec2(widgets::Px(kWidth), widgets::Px(kHeight)));
+        }
+
+        // The style is pushed here instead of being set globally, so other ImGui windows of the app keep theirs.
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 0.0f);
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, style::kBackground);
+        ImGui::PushStyleColor(ImGuiCol_Text, style::kText);
+        ImGui::PushStyleColor(ImGuiCol_PopupBg, style::kDropdown);
+        ImGui::PushStyleColor(ImGuiCol_TextSelectedBg, IM_COL32(0, 187, 255, 102));
+        ImGui::PushStyleColor(ImGuiCol_NavCursor, IM_COL32(0, 0, 0, 0));
+        int colors = 5;
+#if IMGUI_VERSION_NUM >= 19200
+        ImGui::PushStyleColor(ImGuiCol_InputTextCursor, style::kText); // new in 1.92
+        colors++;
+        // 1.92 multiplies the size given to PushFont() by the global font scales, cancel them out
+        // (Setup()'s DPI scale is already in the font).
+        const ImGuiStyle& st = ImGui::GetStyle();
+        ImGui::PushFont(fonts::text, fonts::text->LegacySize / (st.FontScaleMain * st.FontScaleDpi));
+#else
         ImGui::PushFont(fonts::text);
+#endif
         if (ImGui::Begin("##uziclicker", nullptr, flags))
         {
             DrawSidebar();
@@ -130,6 +145,8 @@ namespace uzi
         }
         ImGui::End();
         ImGui::PopFont();
+        ImGui::PopStyleColor(colors);
+        ImGui::PopStyleVar(5);
     }
 
     Settings& GetSettings() { return g_settings; }

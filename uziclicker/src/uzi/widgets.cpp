@@ -92,10 +92,29 @@ namespace uzi::widgets
             }
         }
 
+        // Dear ImGui 1.92 moved the per-size font data into ImFontBaked, these work with 1.91 and 1.92+.
+        float FontSize(ImFont* font)
+        {
+#if IMGUI_VERSION_NUM >= 19200
+            return font->LegacySize;
+#else
+            return font->FontSize;
+#endif
+        }
+
+        float FontAscent(ImFont* font)
+        {
+#if IMGUI_VERSION_NUM >= 19200
+            return font->GetFontBaked(font->LegacySize)->Ascent;
+#else
+            return font->Ascent;
+#endif
+        }
+
         // `pos` is in screen coordinates: x and the baseline.
         void TextAtBaseline(ImFont* font, const ImVec2& pos, ImU32 col, const char* text)
         {
-            ImGui::GetWindowDrawList()->AddText(font, font->FontSize, ImVec2(pos.x, pos.y - font->Ascent), col, text);
+            ImGui::GetWindowDrawList()->AddText(font, FontSize(font), ImVec2(pos.x, pos.y - FontAscent(font)), col, text);
         }
 
         void TextCentered(ImFont* font, const ImRect& bb, float baseline, ImU32 col, const char* text)
@@ -145,7 +164,7 @@ namespace uzi::widgets
 
     float TextWidth(ImFont* font, const char* text)
     {
-        return font->CalcTextSizeA(font->FontSize, FLT_MAX, 0.0f, text).x;
+        return font->CalcTextSizeA(FontSize(font), FLT_MAX, 0.0f, text).x;
     }
 
     void Text(ImFont* font, float x, float baseline, ImU32 color, const char* text)
@@ -398,7 +417,7 @@ namespace uzi::widgets
 
         ImFont* font = fonts::text;
         const float pad_x = ImMax(0.0f, IM_TRUNC((bb.GetWidth() - TextWidth(font, buf)) * 0.5f));
-        const float pad_y = ImMax(0.0f, Px(baseline) - font->Ascent);
+        const float pad_y = ImMax(0.0f, Px(baseline) - FontAscent(font));
         ImGui::SetCursorScreenPos(bb.Min);
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(pad_x, pad_y));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.0f);

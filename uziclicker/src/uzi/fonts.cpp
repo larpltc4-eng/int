@@ -12,6 +12,8 @@ namespace uzi::fonts
     {
         // Poppins has ascender 1050, descender -350 and 1000 units per em. ImGui scales a font so that
         // ascender - descender equals the requested size, so an em size of N px is requested as N * 1.4.
+        // The result is rounded to whole pixels: Dear ImGui 1.92+ only bakes whole pixel sizes and would
+        // stretch (blur) anything else, rounding keeps the text sharp and identical on 1.91 and 1.92.
         constexpr float kEmToImGui = 1.4f;
 
         // `weight`: RasterizerMultiply. The original is drawn by GDI, whose text comes out a bit heavier than
@@ -24,7 +26,8 @@ namespace uzi::fonts
             cfg.OversampleH = 3;
             cfg.OversampleV = 1;
             cfg.RasterizerMultiply = weight;
-            return ImGui::GetIO().Fonts->AddFontFromMemoryCompressedBase85TTF(data_base85, em_size * kEmToImGui * scale, &cfg, ranges);
+            const float size = static_cast<float>(static_cast<int>(em_size * kEmToImGui * scale + 0.5f));
+            return ImGui::GetIO().Fonts->AddFontFromMemoryCompressedBase85TTF(data_base85, size, &cfg, ranges);
         }
     }
 

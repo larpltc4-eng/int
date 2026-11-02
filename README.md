@@ -82,6 +82,12 @@ cmake --build build -j
 ./build/menu_glfw
 ```
 
+## UziClicker
+
+`uziclicker/` holds a second, separate menu: a 1:1 recreation of the UziClicker GUI in a native Win32 + DirectX 11 window (GLFW + OpenGL 3 on Linux). It shares `external/imgui` and is built together with the rest from the repository root. See [uziclicker/README.md](uziclicker/README.md).
+
+![UziClicker](uziclicker/docs/render.png)
+
 ## Fonts
 
 - Montserrat v8.000, SIL Open Font License 1.1 (`src/menu/fonts/LICENSE-Montserrat.txt`), subset to Latin, Latin-1 and Latin Extended-A, so Polish letters work.

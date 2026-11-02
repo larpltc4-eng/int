@@ -62,3 +62,6 @@ if(MENU_BUILD_GLFW)
     )
     target_link_libraries(menu_glfw PRIVATE menu glfw OpenGL::GL ${CMAKE_DL_LIBS})
 endif()
+
+# UziClicker: a separate menu, see uziclicker/README.md -----------------------------------
+add_subdirectory(uziclicker)
